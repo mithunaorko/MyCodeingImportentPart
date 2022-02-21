@@ -1,0 +1,196 @@
+Video Source : https://www.youtube.com/watch?v=CjGEuLgt4nw
+
+import { StarRounded, Favorite, AddRounded } from '@mui/icons-material'
+import React, { useState } from 'react'
+
+export default function ItemCard({imgSrc, name, ratings, price}) {
+    const [isFavourite, setFavourite] = useState(false);
+    -----------------------------------------------------------------------------------------------
+    >>>>this is rating area which is start from here and that is state area 
+    
+    const [currentValue, setCurrentValue] = useState(Math.floor(ratings))
+    
+    const handleClick = (value) => {
+        setCurrentValue(value);
+    }
+    >>>>end rating state area 
+---------------------------------------------------------------------------------------------------
+
+  return (
+    <div className='itemCard'>
+        <div className= {`isfavourite ${isFavourite ? "active" : ""}`}
+            onClick = {() => setFavourite(!isFavourite)}
+        >
+            <Favorite />
+        </div>
+        <div className='imgBox'>
+            <img src={imgSrc} alt='' className='itemImg' />
+        </div>
+        <div className='itemContent'>
+            <h3 className='itemName'>{name}</h3>
+            <div className='bottom'>
+            
+            >>>>this is rating area which is start from here and that is state area 
+
+                <div className='ratings'>
+                    {Array.apply(null, {length : 5}).map((e, i) => (
+                        <i 
+                            key={i} 
+                            className={`rating ${currentValue > i ? "orange" : ""}`}
+                            onClick={() => handleClick(i+1)}
+                        >
+                            <StarRounded />
+                        </i>
+                        
+            >>>>end rating state area 
+                    ))}
+                    <h3 className='price'><span>$</span> {price}</h3>
+                </div>
+                <i className='addtoCart'>
+                    <AddRounded />
+                </i>
+            </div>    
+        </div>
+    </div>
+  )
+}
+
+----------------------------------------------------------------
+CSS AREA
+
+.orange {
+  color: #f8901c !important;
+}
+
+.gray {
+  color: #373848 !important;
+}
+
+
+------------------------------
+main App Area
+
+import { AccountBalanceRounded, Chat, Favorite, HomeRounded, Settings, SummarizeRounded } from "@mui/icons-material";
+import "../Styles/App.css"
+import Header from "./Header";
+import MenuContainer from "./MenuContainer";
+import { useEffect, useState } from "react";
+import BannerName from "./BannerName";
+import SubMenuContainer from "./SubMenuContainer";
+import MenuCard from "./MenuCard";
+import {MenuItems, Items} from "./Data";
+import ItemCard from "./ItemCard";
+
+function App() {
+
+    -----------------------------------------------------------------------------------------------
+    >>>>this is for Rating Area
+
+  // Main Dish State
+  const [isMainData, setMainData] = useState(
+    Items.filter((element) => element.itemId === "chicken01")
+    )
+        >>>>end this is for Rating Area
+---------------------------------------------------------------------------------------------------
+
+  useEffect (() => {
+    const menuLi = document.querySelectorAll('#menu li');
+    
+    function setMenuActive() {
+    menuLi.forEach((n) => n.classList.remove("active"));
+    this.classList.add("active");
+  }
+    menuLi.forEach((n) => n.addEventListener("click", setMenuActive));
+   
+    //Menucard Active toggle
+    const menuCards = document
+    .querySelector('.rowContainer')
+    .querySelectorAll('.rowMenuCard');
+
+    function setMenuCardActive() {
+      menuCards.forEach((n) => n.classList.remove("active"));
+      this.classList.add("active");
+    }
+
+    menuCards.forEach(n => n.addEventListener('click', setMenuCardActive))
+
+  },[isMainData] );
+
+    -----------------------------------------------------------------------------------------------
+    >>>>this is for Rating Area
+
+  //set Main dish Items on Filter
+  const setData = (itemId) => {
+    setMainData(Items.filter((element) => element.itemId === itemId))
+  }
+        >>>>end this is for Rating Area
+---------------------------------------------------------------------------------------------------
+
+  return (
+    <div className="App">
+      {/* Header Section */}
+      <Header />
+      {/* Main Container Area */}
+      <main>
+        <div className='mainContainer'>
+          {/*Banner Area*/}
+          <div className="banner">
+            <BannerName name={"Aorko"} discount={"10"} link={"#"} />
+            <img src="https://firebasestorage.googleapis.com/v0/b/food-flights-d9dec.appspot.com/o/banner.png?alt=media&token=99ceaeda-3783-4206-9600-838eddf051f3" 
+            alt=""
+            className="deliveryPic"
+            />
+          </div>
+          {/*dishContainer Area*/}
+          <div className="dishContainer">
+            <div className="menuCard">
+              <SubMenuContainer name={"Menu Category"} />
+            </div>
+            <div className="rowContainer">
+              {MenuItems && 
+              MenuItems.map((data) => (
+                <div key={data.id} onClick = {() => setData(data.itemId)}>
+                <MenuCard imgSrc={data.imgSrc} 
+                name={data.name} 
+                isActive = {data.id === 1 ? true : false} 
+                />
+              </div>
+              ))}
+            </div>
+            <div className="dishitemContainer">
+              {
+                isMainData && isMainData.map(data => (
+                  <ItemCard 
+                    key={data.id}
+                    itemId={data.id}
+                    imgSrc={data.imgSrc} 
+                    name={data.name} 
+                    ratings={data.ratings} 
+                    price={data.price} 
+              />
+                ))
+              }
+              
+            </div>
+          </div>
+        </div>
+        <div className='rightMenu'></div>
+      </main>
+      
+      {/* Bottom Menu */}
+      <div className="bottomMenu">
+        <ul id="menu">
+          <MenuContainer link={'#'} icon= {<HomeRounded />} isHome />
+          <MenuContainer link={'#'} icon= {<Chat />} />
+          <MenuContainer link={'#'} icon= {<AccountBalanceRounded />} />
+          <MenuContainer link={'#'} icon= {<Favorite />} />
+          <MenuContainer link={'#'} icon= {<SummarizeRounded />} />
+          <MenuContainer link={'#'} icon= {<Settings />} />
+          <div className="indicator"></div>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default App;
